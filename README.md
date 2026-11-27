@@ -153,6 +153,10 @@ exits `1`.
   antiforgery token, then `TimeSlotChangeUserFlow.Index/` to confirm.
 - The login form is reCAPTCHA v3 (`grecaptcha.execute`), so the CLI supports a supplied token and
   cookie import instead of bundling a browser.
+- Sklavenitis sits behind Akamai. From GitHub-hosted runners, `curl` with a Firefox UA still gets
+  HTTP 403, while Python `urllib` with the same UA gets 200; a UA with a custom suffix such as
+  `sklavenitis-cli/0.1.0` is also rejected. That is why `_http.UA` is a plain Firefox string with
+  no version token. Do not add one back, and do not replace the transport with `curl` for CI.
 
 ## Tests and CI
 
