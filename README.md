@@ -16,7 +16,7 @@ delivery slot** and walks the guest checkout wizard for you.
 ## Install
 
 ```bash
-pipx install .
+pipx install git+https://github.com/glogiotatidis/sklavenitis-cli
 # or, from a checkout
 python3 -m venv .venv && .venv/bin/pip install -e . && ln -s "$PWD/.venv/bin/sklavenitis" /usr/local/bin/sklavenitis
 ```
