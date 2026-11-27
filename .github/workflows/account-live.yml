@@ -52,6 +52,27 @@ jobs:
               print("probe" + str(i) + "_status=" + str(r.status)
                     + " cookies=" + str(len(list(api.session.jar))))
           PY
+      - name: Auth status probe
+        if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
+        run: |
+          which sklavenitis
+          sklavenitis --version
+          echo '--- console'
+          sklavenitis auth status --json || true
+          echo '--- module'
+          python -m sklavenitis_cli.cli auth status --json || true
+          echo '--- direct'
+          python - <<'PY'
+          from sklavenitis_cli.api import Api
+          api = Api()
+          print("is_logged_in=" + str(api.is_logged_in()))
+          r = api.session.get("https://www.sklavenitis.gr/account/",
+                              headers={"Referer": "https://www.sklavenitis.gr/"})
+          final = (r.url or "").split("?", 1)[0]
+          print("status=" + str(r.status))
+          print("ok_path=" + str(final.endswith("/account/")))
+          print("signin_path=" + str("/account/signin" in final))
+          PY
       - name: Login, search, cart, orders, logout
         if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
         run: bash scripts/daily-smoke.sh
