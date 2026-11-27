@@ -22,17 +22,10 @@ def main() -> int:
         browser = p.chromium.launch(channel="chrome", headless=True,
                                     args=["--disable-blink-features=AutomationControlled"])
         page = browser.new_page(user_agent=UA, locale="el-GR")
-        page.goto(BASE, wait_until="domcontentloaded", timeout=60_000)
-
-        # The cookie banner covers the header link. Reject it if present.
-        for label in ("Απόρριψη όλων", "Αποδοχή όλων"):
-            button = page.get_by_text(label, exact=True)
-            if button.count() and button.first.is_visible():
-                button.first.click()
-                page.wait_for_timeout(300)
-                break
-
-        page.get_by_text("Είσοδος", exact=True).first.click()
+        # The sign-in page renders the same form directly; skip the header modal
+        # and its cookie-consent overlay.
+        page.goto(BASE + "account/signin-register/", wait_until="domcontentloaded",
+                  timeout=60_000)
         page.wait_for_selector("#login_form", state="visible", timeout=30_000)
         page.wait_for_function(
             "typeof grecaptcha !== 'undefined' && typeof grecaptcha.execute === 'function'",
