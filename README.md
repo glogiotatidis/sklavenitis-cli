@@ -157,8 +157,9 @@ exits `1`.
   form with Playwright and hands the cookies to the CLI (the `auth import` path).
 - Sklavenitis sits behind Akamai. From GitHub-hosted runners, `curl` with a Firefox UA still gets
   HTTP 403, while Python `urllib` with the same UA gets 200; a UA with a custom suffix such as
-  `sklavenitis-cli/0.1.0` is also rejected. That is why `_http.UA` is a plain Firefox string with
-  no version token. Do not add one back, and do not replace the transport with `curl` for CI.
+  `sklavenitis-cli/0.1.0` is also rejected. That is why `_http.UA` is a plain browser string with
+  no version token, matching the Chrome UA used by the CI browser login. Do not add a suffix, and
+  do not replace the transport with `curl` for CI.
 
 ## Tests and CI
 

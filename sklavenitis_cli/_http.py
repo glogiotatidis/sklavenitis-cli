@@ -20,8 +20,10 @@ BASE = "https://www.sklavenitis.gr"
 
 # Keep this a plain browser UA. Akamai returns 403 for a custom suffix such as
 # "sklavenitis-cli/0.1.0" from datacenter IPs (GitHub Actions), even though the
-# same request from a residential IP is allowed.
-UA = "Mozilla/5.0 (X11; Linux x86_64; rv:161.0) Gecko/20100101 Firefox/161.0"
+# same request from a residential IP is allowed. Match the Chrome UA used by the
+# CI browser login so an exported session is used with the same client identity.
+UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36")
 
 
 class TransportError(RuntimeError):
