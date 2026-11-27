@@ -14,15 +14,14 @@ import urllib.parse
 import urllib.request
 from typing import Any, Optional
 
-from . import __version__
 from . import store
 
 BASE = "https://www.sklavenitis.gr"
 
-UA = (
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-    f"(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 sklavenitis-cli/{__version__}"
-)
+# Keep this a plain browser UA. Akamai returns 403 for a custom suffix such as
+# "sklavenitis-cli/0.1.0" from datacenter IPs (GitHub Actions), even though the
+# same request from a residential IP is allowed.
+UA = "Mozilla/5.0 (X11; Linux x86_64; rv:161.0) Gecko/20100101 Firefox/161.0"
 
 
 class TransportError(RuntimeError):
