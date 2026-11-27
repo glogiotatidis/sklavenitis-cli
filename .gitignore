@@ -1,0 +1,13 @@
+# captured traffic and sessions must never be committed
+*.har
+*.HAR
+.env
+cookies.json
+config.json
+
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.DS_Store

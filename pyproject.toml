@@ -1,0 +1,30 @@
+[project]
+name = "sklavenitis-cli"
+version = "0.1.0"
+description = "Sklavenitis.gr search and cart in the terminal: search, delivery slots, and your real cart"
+readme = "README.md"
+requires-python = ">=3.9"
+# No runtime dependencies: the site's user flows, search page and address
+# lookups are plain HTTP and are parsed with urllib and the stdlib.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+sklavenitis = "sklavenitis_cli.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["sklavenitis_cli*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The default run is offline. Live tests hit www.sklavenitis.gr and are opt-in.
+addopts = "-m 'not live'"
+markers = [
+    "live: hits the real www.sklavenitis.gr, needs network and SKLAVENITIS_LIVE=1",
+]
