@@ -132,18 +132,37 @@ class Session:
                 json_body: Any = None, headers: Optional[dict[str, str]] = None,
                 follow: bool = True) -> Response:
         data: Optional[bytes] = None
-        hdrs = {
-            "User-Agent": self.user_agent,
-            "Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
-            "Accept-Language": "el-GR,el;q=0.9,en;q=0.8",
-        }
+        extra = headers or {}
+        ajax = any(key.lower() == "x-requested-with" for key in extra)
+        if ajax:
+            hdrs = {
+                "User-Agent": self.user_agent,
+                "Accept": "*/*",
+                "Accept-Language": "el-GR,el;q=0.9,en;q=0.8",
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Site": "same-origin",
+            }
+        else:
+            hdrs = {
+                "User-Agent": self.user_agent,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+                          "image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "el-GR,el;q=0.9,en;q=0.8",
+                "Upgrade-Insecure-Requests": "1",
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "same-origin",
+                "Sec-Fetch-User": "?1",
+                "Cache-Control": "max-age=0",
+            }
         if json_body is not None:
             data = json.dumps(json_body, ensure_ascii=False).encode()
             hdrs["Content-Type"] = "application/json"
         elif form is not None:
             data = urllib.parse.urlencode(form).encode()
             hdrs["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8"
-        hdrs.update(headers or {})
+        hdrs.update(extra)
 
         req = urllib.request.Request(url, data=data, method=method, headers=hdrs)
         opener = self.opener
