@@ -187,9 +187,9 @@ a warning when the secrets are absent. The script only adds an in-stock SKU that
 in the cart**, sets it to 2, then removes it, so the account's cart is restored. A trap removes the
 line and logs out even when a step fails. The browser step is authoritative: after submit it loads
 `/account/` and fails if it lands on `/account/signin*` or still shows `#login_form`. That means the
-`SKLAVENITIS_EMAIL`/`SKLAVENITIS_PASSWORD` secrets are wrong or the account is unconfirmed/blocked
-— it is not a UA, header, or reCAPTCHA-token issue. It also catches a change in the site's sign-in
-flow.
+`SKLAVENITIS_EMAIL`/`SKLAVENITIS_PASSWORD` secrets are wrong, the account is unconfirmed/blocked,
+or the site is rejecting the automated browser. Verify the same credentials in a normal browser;
+it is not a UA or header issue.
 
 ## Layout
 
