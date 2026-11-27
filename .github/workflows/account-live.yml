@@ -28,6 +28,12 @@ jobs:
       - name: Skip when credentials are absent
         if: env.SKLAVENITIS_EMAIL == '' || env.SKLAVENITIS_PASSWORD == ''
         run: echo "::warning::SKLAVENITIS_EMAIL/SKLAVENITIS_PASSWORD are not configured; skipping the account smoke."
+      - name: Install Playwright for the reCAPTCHA token
+        if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
+        run: python -m pip install playwright
+      - name: Get a reCAPTCHA v3 token
+        if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
+        run: python scripts/recaptcha_token.py >> "$GITHUB_ENV"
       - name: Login, search, cart, orders, logout
         if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
         run: bash scripts/daily-smoke.sh
