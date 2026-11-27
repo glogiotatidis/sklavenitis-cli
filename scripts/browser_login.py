@@ -45,9 +45,17 @@ def main() -> int:
             page.wait_for_timeout(500)
             jar = context.cookies()
             if any(c["name"] == AUTH_COOKIE and c["value"] for c in jar):
-                ok = True
                 cookies = jar
                 break
+        if cookies:
+            # A non-empty auth cookie is not proof: an anonymous session can
+            # carry one too. The account page is the authority.
+            page.goto(BASE + "account/", wait_until="domcontentloaded", timeout=60_000)
+            final = page.url
+            ok = ("/account/signin" not in final
+                  and "/account/login" not in final
+                  and page.locator("#login_form").count() == 0)
+            cookies = context.cookies()
         browser.close()
 
     if ok:
