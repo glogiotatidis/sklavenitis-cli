@@ -49,6 +49,9 @@ jobs:
       - name: Get a reCAPTCHA v3 token
         if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
         run: python scripts/recaptcha_token.py >> "$GITHUB_ENV"
+      - name: Browser login check
+        if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
+        run: python scripts/browser_login_check.py
       - name: Login, search, cart, orders, logout
         if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
         run: bash scripts/daily-smoke.sh
