@@ -40,6 +40,20 @@ jobs:
           export SKLAVENITIS_CONFIG_DIR="$SESSION_DIR"
           echo "SKLAVENITIS_CONFIG_DIR=$SESSION_DIR" >> "$GITHUB_ENV"
           python scripts/browser_login.py
+      - name: Session check
+        if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
+        run: |
+          python - <<'PY'
+          from sklavenitis_cli.api import Api
+          api = Api()
+          print("auth_cookie_present=" + str(bool(api.session.cookie(".AspNet.ApplicationCookie_Frontend4"))))
+          print("cookie_count=" + str(len(list(api.session.jar))))
+          r = api.session.get("https://www.sklavenitis.gr/account/")
+          final = (r.url or "").split("?", 1)[0]
+          print("account_status=" + str(r.status))
+          print("account_ok_path=" + str(final.endswith("/account/")))
+          print("account_signin_path=" + str("/account/signin" in final))
+          PY
       - name: Login, search, cart, orders, logout
         if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
         run: bash scripts/daily-smoke.sh
