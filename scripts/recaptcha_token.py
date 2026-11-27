@@ -34,11 +34,15 @@ def main() -> int:
 
         page.get_by_text("Είσοδος", exact=True).first.click()
         page.wait_for_selector("#login_form", state="visible", timeout=30_000)
-        page.wait_for_function("typeof grecaptcha !== 'undefined'", timeout=30_000)
+        page.wait_for_function(
+            "typeof grecaptcha !== 'undefined' && typeof grecaptcha.execute === 'function'",
+            timeout=30_000,
+        )
         token = page.evaluate("""async () => {
             const el = document.querySelector('[data-plugin-recaptcha]');
             if (!el) throw new Error('no recaptcha element in the login modal');
             const opts = JSON.parse(el.getAttribute('data-plugin-recaptcha'));
+            await new Promise(resolve => grecaptcha.ready(resolve));
             return await grecaptcha.execute(opts.sitekey, {action: 'submit'});
         }""")
         browser.close()
