@@ -46,13 +46,32 @@ jobs:
           python - <<'PY'
           from sklavenitis_cli.api import Api
           api = Api()
+          import time
           print("auth_cookie_present=" + str(bool(api.session.cookie(".AspNet.ApplicationCookie_Frontend4"))))
           print("cookie_count=" + str(len(list(api.session.jar))))
+          print("cookie_names=" + ",".join(sorted(c.name for c in api.session.jar)))
+          for c in api.session.jar:
+              if c.name == ".AspNet.ApplicationCookie_Frontend4":
+                  print("auth_secure=" + str(c.secure) + " path=" + c.path + " domain=" + c.domain)
+                  print("auth_expires_future=" + str((c.expires or 0) > time.time()))
           r = api.session.get("https://www.sklavenitis.gr/account/")
           final = (r.url or "").split("?", 1)[0]
           print("account_status=" + str(r.status))
           print("account_ok_path=" + str(final.endswith("/account/")))
           print("account_signin_path=" + str("/account/signin" in final))
+          headers = {
+              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+              "Accept-Language": "el-GR,el;q=0.9,en;q=0.8",
+              "Upgrade-Insecure-Requests": "1",
+              "Sec-Fetch-Dest": "document",
+              "Sec-Fetch-Mode": "navigate",
+              "Sec-Fetch-Site": "same-origin",
+              "Sec-Fetch-User": "?1",
+              "Referer": "https://www.sklavenitis.gr/",
+              "Cache-Control": "max-age=0",
+          }
+          r2 = api.session.get("https://www.sklavenitis.gr/account/", headers=headers)
+          print("account_status_browser_headers=" + str(r2.status))
           PY
       - name: Login, search, cart, orders, logout
         if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
