@@ -19,6 +19,7 @@ jobs:
     env:
       SKLAVENITIS_EMAIL: ${{ secrets.SKLAVENITIS_EMAIL }}
       SKLAVENITIS_PASSWORD: ${{ secrets.SKLAVENITIS_PASSWORD }}
+      SKLAVENITIS_BROWSER_LOGIN: "1"
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -28,30 +29,16 @@ jobs:
       - name: Skip when credentials are absent
         if: env.SKLAVENITIS_EMAIL == '' || env.SKLAVENITIS_PASSWORD == ''
         run: echo "::warning::SKLAVENITIS_EMAIL/SKLAVENITIS_PASSWORD are not configured; skipping the account smoke."
-      - name: Credential sanity
-        if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
-        run: |
-          python - <<'PY'
-          import os
-          email = os.environ["SKLAVENITIS_EMAIL"].strip().lower()
-          public = {
-              "info@sklavenitis.gr",
-              "emarket@sklavenitis.gr",
-              "905.customer.service@sklavenitis.gr",
-          }
-          print("email_is_known_public_contact=" + str(email in public))
-          print("password_has_outer_whitespace="
-                + str(os.environ["SKLAVENITIS_PASSWORD"] != os.environ["SKLAVENITIS_PASSWORD"].strip()))
-          PY
-      - name: Install Playwright for the reCAPTCHA token
+      - name: Install Playwright for the browser login
         if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
         run: python -m pip install playwright
-      - name: Get a reCAPTCHA v3 token
+      - name: Browser login and export the session
         if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
-        run: python scripts/recaptcha_token.py >> "$GITHUB_ENV"
-      - name: Browser login check
-        if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
-        run: python scripts/browser_login_check.py
+        run: |
+          SESSION_DIR="$RUNNER_TEMP/sklavenitis-session"
+          mkdir -p "$SESSION_DIR"
+          echo "SKLAVENITIS_CONFIG_DIR=$SESSION_DIR" >> "$GITHUB_ENV"
+          python scripts/browser_login.py
       - name: Login, search, cart, orders, logout
         if: env.SKLAVENITIS_EMAIL != '' && env.SKLAVENITIS_PASSWORD != ''
         run: bash scripts/daily-smoke.sh

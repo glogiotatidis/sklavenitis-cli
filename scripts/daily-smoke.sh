@@ -8,7 +8,7 @@ set -euo pipefail
 : "${SKLAVENITIS_EMAIL:?SKLAVENITIS_EMAIL is required}"
 : "${SKLAVENITIS_PASSWORD:?SKLAVENITIS_PASSWORD is required}"
 
-CFG=$(mktemp -d)
+CFG="${SKLAVENITIS_CONFIG_DIR:-$(mktemp -d)}"
 export SKLAVENITIS_CONFIG_DIR="$CFG"
 ADDED=0
 LOGGED_OUT=0
@@ -28,11 +28,15 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 echo "== login"
-sklavenitis auth login --json >"$CFG/login.json"
-jq -e '.authenticated == true' "$CFG/login.json" >/dev/null
-
-sklavenitis auth status --json >"$CFG/status.json"
-jq -e '.authenticated == true' "$CFG/status.json" >/dev/null
+if [ "${SKLAVENITIS_BROWSER_LOGIN:-0}" = "1" ]; then
+    sklavenitis auth status --json >"$CFG/status.json"
+    jq -e '.authenticated == true' "$CFG/status.json" >/dev/null
+else
+    sklavenitis auth login --json >"$CFG/login.json"
+    jq -e '.authenticated == true' "$CFG/login.json" >/dev/null
+    sklavenitis auth status --json >"$CFG/status.json"
+    jq -e '.authenticated == true' "$CFG/status.json" >/dev/null
+fi
 echo "login ok"
 
 echo "== delivery"
