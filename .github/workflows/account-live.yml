@@ -37,6 +37,7 @@ jobs:
         run: |
           SESSION_DIR="$RUNNER_TEMP/sklavenitis-session"
           mkdir -p "$SESSION_DIR"
+          export SKLAVENITIS_CONFIG_DIR="$SESSION_DIR"
           echo "SKLAVENITIS_CONFIG_DIR=$SESSION_DIR" >> "$GITHUB_ENV"
           python scripts/browser_login.py
       - name: Login, search, cart, orders, logout
