@@ -116,7 +116,11 @@ class Api:
         return bool(self.session.cookie(AUTH_COOKIE))
 
     def is_logged_in(self) -> bool:
+        # The account page can answer the first request with a 403 bot
+        # challenge; that response sets the cookie the retry needs.
         r = self.session.get(BASE + "/account/", headers={"Referer": BASE + "/"})
+        if r.status == 403:
+            r = self.session.get(BASE + "/account/", headers={"Referer": BASE + "/"})
         final = (r.url or "").rstrip("/")
         if r.status != 200:
             return False
