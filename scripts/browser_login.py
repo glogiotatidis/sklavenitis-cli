@@ -2,9 +2,11 @@
 
 The site rejects the dependency-free CLI's direct login even with a reCAPTCHA
 token (the form is bound to the browser session). This helper submits the real
-form with the runner's Chrome, then writes the site cookies into the CLI's
-config directory, exactly like `sklavenitis auth import`. It prints one boolean,
-never credentials, cookies, or the email.
+form with the runner's Chrome, verifies it reaches `/account/`, then writes the
+site cookies into the CLI's config directory, exactly like
+`sklavenitis auth import`. A sign-in page after submit means the credentials are
+wrong or the account is unconfirmed/blocked — not a header issue. It prints one
+boolean, never credentials, cookies, or the email.
 """
 from __future__ import annotations
 

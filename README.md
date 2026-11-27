@@ -185,8 +185,11 @@ dedicated test account **with at least one past order** — the job asserts `.co
 fetches one order detail, so a broken order-history parser fails the daily run. The job skips with
 a warning when the secrets are absent. The script only adds an in-stock SKU that is **not already
 in the cart**, sets it to 2, then removes it, so the account's cart is restored. A trap removes the
-line and logs out even when a step fails. The browser login is also the early warning that the
-site's sign-in flow changed; if it fails, check the credentials and the Playwright login first.
+line and logs out even when a step fails. The browser step is authoritative: after submit it loads
+`/account/` and fails if it lands on `/account/signin*` or still shows `#login_form`. That means the
+`SKLAVENITIS_EMAIL`/`SKLAVENITIS_PASSWORD` secrets are wrong or the account is unconfirmed/blocked
+— it is not a UA, header, or reCAPTCHA-token issue. It also catches a change in the site's sign-in
+flow.
 
 ## Layout
 
